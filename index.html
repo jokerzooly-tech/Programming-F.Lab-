@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مختبر بايثون - أسئلة وامتحانات</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f4f7fb;
+      color: #1e2b3a;
+      padding: 2rem 1rem;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark { background: #121a24; color: #e6edf5; }
+    body.dark .card, body.dark .exam-question, body.dark .exam-result {
+      background: #1c2938; border-color: #2d4057;
+    }
+    body.dark .code-block { background: #0b151f; border-color: #3d5775; }
+    body.dark .btn-solution { border-color: #5b8db8; color: #b0d0ec; }
+    body.dark .btn-solution:hover { background: #3a7ca5; color: #fff; }
+    body.dark .btn-toggle { background: #2a3f56; color: #d6e5f5; }
+    body.dark .btn-toggle:hover { background: #3a5775; }
+    body.dark .header { border-bottom-color: #2d4055; }
+    body.dark .header h1 { color: #b6d0e8; }
+    body.dark footer { color: #7a9bbb; border-top-color: #2d4057; }
+    body.dark .section-title { color: #b6d0e8; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    .header {
+      display: flex; flex-wrap: wrap; justify-content: space-between;
+      align-items: center; gap: 1rem; margin-bottom: 2rem;
+      border-bottom: 2px solid #cbd8e6; padding-bottom: 1rem;
+    }
+    .header h1 { font-size: 2.2rem; color: #0a2f44; }
+    .controls { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .btn-toggle {
+      background: #e2eaf2; border: none; padding: 0.5rem 1.2rem;
+      border-radius: 40px; font-weight: 600; font-size: 0.9rem;
+      color: #1a3a55; cursor: pointer; transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .btn-toggle:hover { background: #c7d8e8; transform: scale(1.02); }
+    .section-title {
+      font-size: 1.8rem; margin: 2rem 0 1rem; color: #0a2f44;
+      border-right: 6px solid #3a7ca5; padding-right: 1rem;
+    }
+    .question-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1.8rem;
+    }
+    .card {
+      background: white; border-radius: 28px; padding: 1.5rem 1.5rem 1rem;
+      box-shadow: 0 10px 28px rgba(0,20,40,0.06);
+      border: 1px solid #eaf0f6; transition: 0.2s;
+      display: flex; flex-direction: column;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,20,40,0.10); }
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.4rem; font-size: 0.75rem; color: #3a5a78;
+    }
+    .lab-tag { background: #d9e6f2; padding: 0.2rem 1rem; border-radius: 30px; font-weight: 600; }
+    .q-type { background: #eef3f9; padding: 0.2rem 1rem; border-radius: 30px; }
+    .question-text {
+      font-size: 1rem; font-weight: 500; line-height: 1.8;
+      margin: 0.5rem 0 0.8rem; padding: 0.6rem 1rem;
+      background: #f2f8ff; border-radius: 18px;
+      border-right: 4px solid #3a7ca5; color: #0b2a3e;
+    }
+    .code-block {
+      background: #0e1e2b; color: #e3f0fa; padding: 0.8rem 1rem;
+      border-radius: 16px; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem; line-height: 1.8; white-space: pre-wrap;
+      word-break: break-word; margin: 0.6rem 0 0.2rem;
+      direction: ltr; text-align: left; max-height: 350px;
+      overflow-y: auto; border: 1px solid #2a4055;
+    }
+    .btn-solution {
+      background: transparent; border: 1px solid #3a7ca5;
+      color: #1e5a7a; padding: 0.3rem 1.2rem; border-radius: 40px;
+      font-weight: 600; font-size: 0.8rem; cursor: pointer;
+      align-self: flex-start; margin-top: 0.6rem; transition: 0.15s;
+    }
+    .btn-solution:hover { background: #3a7ca5; color: white; }
+    .solution-wrapper { display: none; margin-top: 0.3rem; }
+    .solution-wrapper.show { display: block; }
+    .lang-en .question-text-ar { display: none; }
+    .lang-ar .question-text-en { display: none; }
+    .question-text-ar, .question-text-en { display: block; }
+    .lang-en .question-text-ar { display: none; }
+    .lang-en .question-text-en { display: block; }
+    .exam-section { margin-top: 3rem; border-top: 2px dashed #b0c8dd; padding-top: 2rem; }
+    .exam-question {
+      background: white; border-radius: 20px; padding: 1.2rem 1.5rem;
+      margin-bottom: 1.2rem; border: 1px solid #eaf0f6;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .exam-question p { font-weight: 600; margin-bottom: 0.5rem; }
+    .exam-question label { display: block; margin: 0.3rem 0; font-weight: 400; cursor: pointer; }
+    .exam-question input[type="radio"] { margin-left: 0.5rem; }
+    .exam-result {
+      background: white; border-radius: 28px; padding: 1.5rem;
+      margin-top: 2rem; border: 2px solid #3a7ca5;
+      text-align: center; font-size: 1.3rem; font-weight: 600;
+    }
+    .btn-submit {
+      background: #3a7ca5; color: white; border: none;
+      padding: 0.7rem 2.5rem; border-radius: 40px;
+      font-size: 1.1rem; font-weight: 600; cursor: pointer;
+      margin-top: 1rem; transition: 0.2s;
+    }
+    .btn-submit:hover { background: #2a5f82; transform: scale(1.02); }
+    .exam-selector {
+      display: flex; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+    .exam-selector button {
+      background: #e2eaf2; border: none; padding: 0.5rem 1.5rem;
+      border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.2s;
+    }
+    .exam-selector button:hover { background: #c7d8e8; }
+    .exam-selector button.active { background: #3a7ca5; color: white; }
+    footer { margin-top: 3rem; text-align: center; font-size: 0.85rem; color: #5f7e9a; border-top: 1px solid #d0dce8; padding-top: 1.5rem; }
+  </style>
+</head>
+<body class="lang-ar">
+  <div class="container">
+    <div class="header">
+      <h1>🧪 مختبر بايثون - أسئلة وامتحانات</h1>
+      <div class="controls">
+        <button class="btn-toggle" id="langToggle">🇸🇦 عربي / English</button>
+        <button class="btn-toggle" id="darkToggle">🌙 الوضع المظلم</button>
+      </div>
+    </div>
+      <!-- ===== قسم الأسئلة من الملف ===== -->
+  <h2 class="section-title">📚 الأسئلة والأمثلة (من الملف)</h2>
+  <div class="question-grid" id="questionsGrid"></div>
+
+  <!-- ===== قسم الامتحان ===== -->
+  <div class="exam-section">
+    <h2 class="section-title">📝 بنك الأسئلة (90 سؤال) - اختر امتحان</h2>
+    <div class="exam-selector" id="examSelector"></div>
+    <div id="examContainer"></div>
+    <button class="btn-submit" id="submitExam">✅ تصحيح الامتحان</button>
+    <div class="exam-result" id="examResult" style="display:none;"></div>
+  </div>
+
+  <footer>جميع الأسئلة مأخوذة من دليل المختبر · أساسيات البرمجة باستخدام بايثون</footer>
+</div>
+
+<script>
+  // ============================================================
+  // بيانات الأسئلة من الملف (جميع الأمثلة والتمارين كما هي)
+  // ============================================================
+  const fileQuestions = [
+    // ======== لاب 1: الخوارزميات ========
+    { lab: 1, type: 'مثال', ar: 'خوارزمية تحضير كوب شاي', en: 'Algorithm: Making a Cup of Tea', code: '1) Start.\n2) Fill the kettle with water.\n3) Turn on the kettle to boil the water.\n4) Place a tea bag in the cup.\n5) Once the water boils, pour the hot water into the cup over the tea bag.\n6) Wait 2-3 minutes for the tea to steep.\n7) Remove the tea bag from the cup.\n8) Add sugar (optional).\n9) Add milk or lemon (optional).\n10) Stir the mixture well with a spoon.\n11) The tea is ready to serve.\n12) End.' },
+    { lab: 1, type: 'مثال', ar: 'خوارزمية إيجاد مجموع رقمين', en: 'Algorithm: Sum of Two Numbers', code: '1) Start.\n2) Enter the first number, A.\n3) Enter the second number, B.\n4) Add the two numbers and store the result in SUM.\n5) Print the value of SUM.\n6) End.' },
+    { lab: 1, type: 'مثال', ar: 'خوارزمية إيجاد الأكبر من رقمين', en: 'Algorithm: Larger of Two Numbers', code: '1) Start.\n2) Enter two numbers, A and B.\n3) If A > B, print "A is greater."\n4) Else, print "B is greater."\n5) End.' },
+    { lab: 1, type: 'تمرين', ar: 'اطبع اسمك ورقمك وتخصصك في سطور منفصلة', en: 'Print name, ID, and major on separate lines', code: 'print("Name: John Doe")\nprint("Student ID: 20250123")\nprint("Major: Computer Science")' },
+    { lab: 1, type: 'تمرين', ar: 'اطبع عملية حسابية بسيطة (مثل 5+3)', en: 'Print a simple arithmetic operation', code: 'print(5 + 3)' },
+
+    // ======== لاب 2: المتغيرات والإدخال ========
+    { lab: 2, type: 'مثال', ar: 'تعريف متغيرات من أنواع مختلفة', en: 'Variables of different types', code: 'x = 10          # int\ny = 3.14        # float\nname = "Python" # str\nis_active = True # bool\n\nprint("Value:", x, "Type:", type(x))\nprint("Value:", y, "Type:", type(y))\nprint("Value:", name, "Type:", type(name))\nprint("Value:", is_active, "Type:", type(is_active))' },
+    { lab: 2, type: 'مثال', ar: 'إدخال المستخدم وطباعة رسالة', en: 'User input and print', code: 'name = input("Enter your name:")\nprint("Hello", name)' },
+    { lab: 2, type: 'مثال', ar: 'تحويل النوع (casting) من نص إلى عدد صحيح', en: 'Casting string to int', code: 'num1 = input("Enter a number:")\nnum2 = input("Enter another number:")\nnum1 = int(num1)\nnum2 = int(num2)\nsum = num1 + num2\nprint("The sum is:", sum)' },
+    { lab: 2, type: 'تمرين محلول', ar: 'برنامج معلومات الطالب (الاسم، العمر، المعدل، طالب جديد)', en: 'Student info program', code: 'name = input("Enter your name:")\nage = int(input("Enter your age:"))\ngpa = float(input("Enter your GPA:"))\nis_new_student = input("Are you a new student? (yes/no):")\n\nprint("\\n--- Student Information ---")\nprint("Name:", name, "Type:", type(name))\nprint("Age:", age, "Type:", type(age))\nprint("GPA:", gpa, "Type:", type(gpa))\nprint("Is New Student:", is_new_student, "Type:", type(is_new_student))' },
+    { lab: 2, type: 'تمرين', ar: 'اطلب الاسم والعمر والمدينة واطبعهم في جملة', en: 'Ask for name, age, city and print a sentence', code: 'name = input("Enter your name:")\nage = input("Enter your age:")\ncity = input("Enter your city:")\nprint("\\n--- User Information ---")\nprint("Name:", name)\nprint("Age:", age)\nprint("City:", city)' },
+    { lab: 2, type: 'تمرين', ar: 'اطلب رقمين واطبع ناتج الجمع والطرح والضرب والقسمة', en: 'Two numbers arithmetic', code: 'num1 = float(input("Enter first number: "))\nnum2 = float(input("Enter second number: "))\nprint("Sum:", num1+num2)\nprint("Difference:", num1-num2)\nprint("Product:", num1*num2)\nprint("Quotient:", num1/num2)' },
+
+    // ======== لاب 3: المعاملات ========
+    { lab: 3, type: 'مثال', ar: 'آلة حاسبة بسيطة (جمع، طرح، ضرب، قسمة)', en: 'Simple calculator', code: 'num1 = float(input("Enter the first number: "))\nnum2 = float(input("Enter the second number: "))\nsum_result = num1 + num2\ndifference = num1 - num2\nproduct = num1 * num2\nquotient = num1 / num2\nprint("\\n--- Calculator Results ---")\nprint("Sum:", sum_result)\nprint("Difference:", difference)\nprint("Product:", product)\nprint("Quotient:", quotient)' },
+    { lab: 3, type: 'مثال', ar: 'حساب مساحة الدائرة', en: 'Area of a circle', code: 'radius = float(input("Enter the radius of the circle: "))\npi = 3.14159\narea = pi * radius ** 2\nprint("The area of the circle is:", area)' },
+    { lab: 3, type: 'مثال', ar: 'التحقق من العمر (أكبر من أو يساوي 18)', en: 'Age check (>= 18)', code: 'age = int(input("Enter your age: "))\nprint(age >= 18)' },
+    { lab: 3, type: 'تمرين', ar: 'أوجد مجموع و متوسط ثلاثة أعداد', en: 'Sum and average of three numbers', code: '# خذ ثلاثة أعداد واجمعها واقسم على 3' },
+
+    // ======== لاب 4: مقدمة في القوائم ========
+    { lab: 4, type: 'مثال', ar: 'إنشاء قوائم بأنواع مختلفة', en: 'Create lists with different types', code: 'numbers = [1,2,3,4]\nwords = ["apple","banana","cherry"]\nmixed_list = [100,"Hello",3.14,False]\nprint(numbers)\nprint(words)\nprint(mixed_list)' },
+    { lab: 4, type: 'مثال', ar: 'الوصول إلى عناصر القائمة باستخدام الفهرس', en: 'Access list elements by index', code: 'fruits = ["apple","banana","cherry","date"]\nprint(fruits[0])   # first\nprint(fruits[2])   # third\nprint(fruits[-1])  # last\nprint(fruits[-2])  # second last' },
+    { lab: 4, type: 'مثال', ar: 'استخدام len() لمعرفة طول القائمة', en: 'len() function', code: 'numbers = [10,20,30,40,50]\nprint("Length:", len(numbers))' },
+    { lab: 4, type: 'تمرين', ar: 'أنشئ ثلاث قوائم: أفلام، درجات، معلومات مختلطة', en: 'Create three lists: movies, grades, mixed info', code: 'movies = ["Titanic","Avatar","Inception","The Lion King"]\ngrades = [85.5,90.0,78.5,88.0]\ninfo = ["John",22,1.75]\nprint("Favorite Movies:", movies)\nprint("Grades:", grades)\nprint("Personal Info:", info)' },
+    { lab: 4, type: 'تمرين', ar: 'اطبع أول وآخر فيلم من قائمة الأفلام', en: 'Print first and last movie', code: 'movies = ["Titanic", "Avatar", "Inception", "The Lion King"]\nprint("First movie:", movies[0])\nprint("Last movie:", movies[-1])' },
+    { lab: 4, type: 'تمرين', ar: 'اطبع عدد الدرجات باستخدام len()', en: 'Print number of grades using len()', code: 'grades = [85.5, 90.0, 78.5, 88.0]\nprint("Number of grades:", len(grades))' },
+
+    // ======== لاب 5: العمل مع القوائم ========
+    { lab: 5, type: 'مثال', ar: 'إضافة عنصر باستخدام append()', en: 'append() example', code: 'fruits = ["apple","banana","cherry"]\nfruits.append("orange")\nprint(fruits)' },
+    { lab: 5, type: 'مثال', ar: 'إدراج عنصر باستخدام insert()', en: 'insert() example', code: 'fruits = ["apple","banana","cherry"]\nfruits.insert(1,"mango")\nprint(fruits)' },
+    { lab: 5, type: 'مثال', ar: 'حذف آخر عنصر باستخدام pop()', en: 'pop() example', code: 'fruits = ["apple","banana","cherry"]\nfruits.pop()\nprint(fruits)' },
+    { lab: 5, type: 'مثال', ar: 'حذف عنصر باستخدام remove()', en: 'remove() example', code: 'fruits = ["apple","banana","cherry"]\nfruits.remove("banana")\nprint(fruits)' },
+    { lab: 5, type: 'مثال', ar: 'الفرق بين sort() و sorted()', en: 'sort() vs sorted()', code: 'numbers = [3,1,4,2]\nnumbers.sort()\nprint(numbers)  # [1,2,3,4]\n\nnumbers = [3,1,4,2]\nsorted_numbers = sorted(numbers)\nprint("Sorted copy:", sorted_numbers)\nprint("Original list:", numbers)' },
+    { lab: 5, type: 'مثال', ar: 'تقطيع القائمة (slicing)', en: 'list slicing', code: 'fruits = ["apple","banana","cherry","orange","grape"]\nprint(fruits[1:4])   # ["banana", "cherry", "orange"]\nprint(fruits[-3:])   # ["cherry", "orange", "grape"]' },
+    { lab: 5, type: 'تمرين', ar: 'قائمة ضيوف: أنشئ قائمة بثلاثة أسماء', en: 'Guest list: create list of 3 names', code: 'guests = ["Alice","Bob","Charlie"]\nprint("Guest list:", guests)' },
+    { lab: 5, type: 'تمرين', ar: 'أضف ضيفين (append و insert)', en: 'Add guests (append & insert)', code: 'guests = ["Alice","Bob","Charlie"]\nguests.append("David")\nguests.insert(0, "Eve")\nprint("Updated guest list:", guests)' },
+    { lab: 5, type: 'تمرين', ar: 'احذف ضيفين (pop و remove)', en: 'Remove guests (pop & remove)', code: 'guests = ["Alice","Bob","Charlie","David","Eve"]\nlast_guest = guests.pop()\nprint(last_guest, "can\'t make it.")\nguests.remove("Bob")\nprint("Final guest list:", guests)' },
+    { lab: 5, type: 'تمرين', ar: 'رتب القائمة باستخدام sort()', en: 'Sort list using sort()', code: 'guests = ["Alice","Bob","Charlie"]\nguests.sort()\nprint("Sorted guest list:", guests)' },
+  ];
+</script>
+</body>
+</html>
+<script>
+  // ============================================================
+  // الجزء الثالث: تكملة الأسئلة (لاب 6 إلى 10)
+  // ============================================================
+
+  // ======== لاب 6: جمل القرار البسيطة ========
+  fileQuestions.push(
+    { lab: 6, type: 'مثال', ar: 'جملة if (تحقق من العمر)', en: 'if statement (age check)', code: 'age = int(input("Enter your age: "))\nif age >= 18:\n    print("You are an adult.")' },
+    { lab: 6, type: 'مثال', ar: 'جملة if-else', en: 'if-else statement', code: 'age = int(input("Enter your age: "))\nif age >= 18:\n    print("You are an adult.")\nelse:\n    print("You are not an adult.")' },
+    { lab: 6, type: 'مثال', ar: 'جملة if-elif-else', en: 'if-elif-else statement', code: 'age = int(input("Enter your age: "))\nif age < 13:\n    print("You are a child.")\nelif age < 20:\n    print("You are a teenager.")\nelif age < 60:\n    print("You are an adult.")\nelse:\n    print("You are a senior citizen.")' },
+    { lab: 6, type: 'تمرين', ar: 'تحقق من الرقم (موجب، سالب، صفر)', en: 'Check number (positive, negative, zero)', code: 'num = int(input("Enter an integer: "))\nif num > 0:\n    print("Positive")\nelif num < 0:\n    print("Negative")\nelse:\n    print("Zero")' },
+    { lab: 6, type: 'تمرين', ar: 'تقييم الدرجة (A, B, C, D, F)', en: 'Grade calculator', code: 'score = int(input("Enter your score (0-100): "))\nif score >= 90:\n    print("Grade: A")\nelif score >= 80:\n    print("Grade: B")\nelif score >= 70:\n    print("Grade: C")\nelif score >= 60:\n    print("Grade: D")\nelse:\n    print("Grade: F")' },
+    { lab: 6, type: 'تمرين', ar: 'تحقق من العدد (زوجي أو فردي)', en: 'Even or odd', code: 'num = int(input("Enter a number: "))\nif num % 2 == 0:\n    print("Even")\nelse:\n    print("Odd")' }
+  );
+
+  // ======== لاب 7: القرارات المتداخلة ========
+  fileQuestions.push(
+    { lab: 7, type: 'مثال', ar: 'جملة if متداخلة (التحقق من العمر والدرجة)', en: 'Nested if (age and score)', code: 'age = int(input("Enter your age: "))\nscore = int(input("Enter your score: "))\nif age >= 18:\n    if score >= 50:\n        print("Eligible")\n    else:\n        print("Not eligible due to low score")\nelse:\n    print("Not eligible due to age")' },
+    { lab: 7, type: 'مثال', ar: 'شروط مركبة باستخدام and', en: 'Complex condition with and', code: 'age = int(input("Enter your age: "))\nscore = int(input("Enter your score: "))\nif age >= 18 and score >= 50:\n    print("Eligible")\nelse:\n    print("Not eligible")' },
+    { lab: 7, type: 'مثال', ar: 'شروط مركبة باستخدام or', en: 'Complex condition with or', code: 'age = int(input("Enter your age: "))\nscore = int(input("Enter your score: "))\nif age < 18 or score < 50:\n    print("Not eligible")\nelse:\n    print("Eligible")' },
+    { lab: 7, type: 'تمرين', ar: 'تأهيل القرض (راتب >= 50000 و سنتين في العمل)', en: 'Loan qualifier', code: 'salary = float(input("Enter your annual salary: "))\nyears_on_job = int(input("Enter years at current job: "))\nif salary >= 50000:\n    if years_on_job >= 2:\n        print("Loan Approved")\n    else:\n        print("Loan Denied")\nelse:\n    print("Loan Denied")' },
+    { lab: 7, type: 'تمرين', ar: 'سعر تذكرة السينما حسب العمر', en: 'Movie ticket price by age', code: 'age = int(input("Enter your age: "))\nif age < 12:\n    price = 5\nelif age >= 65:\n    price = 7\nelse:\n    price = 12\nprint(f"Ticket price: ${price}")' },
+    { lab: 7, type: 'تمرين', ar: 'سعر التذكرة مع خصم العرض المسائي', en: 'Ticket with matinee discount', code: 'age = int(input("Enter your age: "))\nmatinee = input("Is it a matinee show (yes/no)? ").lower()\nif age < 12:\n    price = 5\nelif age >= 65:\n    price = 7\nelse:\n    price = 12\nif matinee == "yes":\n    price -= 2\nprint(f"Ticket price: ${price}")' }
+  );
+
+  // ======== لاب 8: while loops ========
+  fileQuestions.push(
+    { lab: 8, type: 'مثال', ar: 'while loop (طباعة الأعداد من 1 إلى 5)', en: 'while loop (print 1 to 5)', code: 'i = 1\nwhile i <= 5:\n    print(i)\n    i += 1' },
+    { lab: 8, type: 'مثال', ar: 'التحقق من صحة الإدخال (while)', en: 'Input validation with while', code: 'num = int(input("Enter a positive number: "))\nwhile num <= 0:\n    print("Invalid input, try again.")\n    num = int(input("Enter a positive number: "))\nprint(f"You entered: {num}")' },
+    { lab: 8, type: 'مثال', ar: 'عداد (الأعداد الأكبر من 75)', en: 'Counter (numbers > 75)', code: 'count = 0\nnum = int(input("Enter a number (0 to stop): "))\nwhile num != 0:\n    if num > 75:\n        count += 1\n    num = int(input("Enter a number (0 to stop): "))\nprint(f"Numbers greater than 75: {count}")' },
+    { lab: 8, type: 'تمرين', ar: 'مجموع الأعداد الموجبة (while)', en: 'Sum of positive numbers (while)', code: 'total = 0\nnum = int(input("Enter a positive number (negative to stop): "))\nwhile num >= 0:\n    total += num\n    num = int(input("Enter a positive number (negative to stop): "))\nprint(f"Sum of positive numbers: {total}")' },
+    { lab: 8, type: 'تمرين', ar: 'التحقق من صحة الدرجة (0-100)', en: 'Validate score (0-100)', code: 'score = int(input("Enter a score between 0 and 100: "))\nwhile score < 0 or score > 100:\n    print("Invalid score. Try again.")\n    score = int(input("Enter a score between 0 and 100: "))\nprint(f"Valid score entered: {score}")' }
+  );
+
+  // ======== لاب 9: for loops ========
+  fileQuestions.push(
+    { lab: 9, type: 'مثال', ar: 'for loop مع قائمة (فواكه)', en: 'for loop with list (fruits)', code: 'fruits = ["apple","banana","cherry","orange"]\nfor fruit in fruits:\n    print(fruit)' },
+    { lab: 9, type: 'مثال', ar: 'for loop مع range()', en: 'for loop with range()', code: 'for i in range(1, 6):\n    print(i)' },
+    { lab: 9, type: 'مثال', ar: 'for loop مع range(start, stop, step)', en: 'for loop with range(start, stop, step)', code: 'for i in range(2, 11, 2):\n    print(i)' },
+    { lab: 9, type: 'مثال', ar: 'طباعة عناصر القائمة باستخدام الفهرس', en: 'Print list elements using index', code: 'numbers = [10, 20, 30]\nfor i in range(len(numbers)):\n    print(f"Element {i}: {numbers[i]}")' },
+    { lab: 9, type: 'مثال', ar: 'مثلث نجوم (nested loop)', en: 'Triangle of stars (nested loop)', code: 'for i in range(1, 6):\n    for j in range(i):\n        print("*", end="")\n    print()' },
+    { lab: 9, type: 'تمرين', ar: 'اطبع "I love to eat [food]" لكل عنصر في القائمة', en: 'Print "I love to eat [food]" for each item', code: 'foods = ["pizza","burger","pasta","ice cream"]\nfor food in foods:\n    print("I love to eat", food)' },
+    { lab: 9, type: 'تمرين', ar: 'جدول الضرب من 1 إلى 10', en: 'Multiplication table 1 to 10', code: 'num = int(input("Enter a number: "))\nfor i in range(1, 11):\n    print(num, "x", i, "=", num * i)' }
+  );
+
+  // ======== لاب 10: الدوال ========
+  fileQuestions.push(
+    { lab: 10, type: 'مثال', ar: 'دالة بدون بارامترات (طباعة)', en: 'Function without parameters (print)', code: 'def greet():\n    print("Hello! Welcome to Python Functions.")\ngreet()' },
+    { lab: 10, type: 'مثال', ar: 'دالة مع بارامترات', en: 'Function with parameters', code: 'def greet_user(name):\n    print("Hello", name, "Welcome to Python.")\nuser_name = input("Enter your name:")\ngreet_user(user_name)' },
+    { lab: 10, type: 'مثال', ar: 'دالة مع return (جمع رقمين)', en: 'Function with return (add two numbers)', code: 'def add_numbers(a, b):\n    return a + b\nresult = add_numbers(5, 7)\nprint("The sum is:", result)' },
+    { lab: 10, type: 'تمرين', ar: 'دالة لحساب مربع الرقم', en: 'Function to square a number', code: 'def square(num):\n    return num * num\nnumber = int(input("Enter a number: "))\nprint("The square is:", square(number))' },
+    { lab: 10, type: 'تمرين', ar: 'دالة لتحويل درجة الحرارة من سلسيوس إلى فهرنهايت', en: 'Temperature converter', code: 'def celsius_to_fahrenheit(celsius):\n    return (celsius * 9/5) + 32\ntemp_c = float(input("Enter temperature in Celsius: "))\nprint("Temperature in Fahrenheit:", celsius_to_fahrenheit(temp_c))' },
+    { lab: 10, type: 'تمرين', ar: 'دالة لإيجاد أكبر رقمين', en: 'Function to find max of two numbers', code: 'def max_of_two(a, b):\n    if a > b:\n        return a\n    else:\n        return b\nx = int(input("Enter first number: "))\ny = int(input("Enter second number: "))\nprint("The larger number is:", max_of_two(x, y))' },
+    { lab: 10, type: 'تمرين', ar: 'دالة لحساب مساحة الدائرة', en: 'Function to calculate area of circle', code: 'def calculate_area(radius):\n    pi = 3.14159\n    return pi * radius * radius\nr = float(input("Enter the radius of the circle: "))\narea = calculate_area(r)\nprint("The area of the circle is:", area)' }
+  );
+
+  // ============================================================
+  // بنك الأسئلة (90 سؤال)
+  // ============================================================
+  const bankQuestions = [];
+  const topics = [
+    { ar: 'ما هو مخرج الكود التالي؟', en: 'What is the output of the following code?' },
+    { ar: 'أي من التالي هو نوع البيانات الصحيح للنص؟', en: 'Which is the correct data type for text?' },
+    { ar: 'ما هي دالة الإدخال في بايثون؟', en: 'What is the input function in Python?' },
+    { ar: 'كيف تحول النص إلى عدد صحيح؟', en: 'How to convert a string to an integer?' },
+    { ar: 'أي دالة تستخدم لإضافة عنصر إلى نهاية القائمة؟', en: 'Which function adds an element to the end of a list?' },
+    { ar: 'ما هو مخرج len(["a","b","c"])؟', en: 'What is the output of len(["a","b","c"])?' },
+    { ar: 'كيف تكتب حلقة while تطبع الأعداد من 1 إلى 3؟', en: 'How to write a while loop that prints 1 to 3?' },
+    { ar: 'ما هي وظيفة دالة sort() في القوائم؟', en: 'What does sort() do to a list?' },
+    { ar: 'كيف تكتب دالة تطبع "مرحباً"؟', en: 'How to define a function that prints "Hello"?' },
+    { ar: 'ما هو مخرج if 5 > 3: print("نعم")؟', en: 'What is the output of if 5 > 3: print("Yes")?' },
+    { ar: 'أي من التالي يعتبر نوع بيانات صحيح؟', en: 'Which is a valid data type?' },
+    { ar: 'كيف تصل إلى أول عنصر في قائمة؟', en: 'How to access the first element of a list?' },
+    { ar: 'ما هو مخرج for i in range(2): print(i)؟', en: 'What is the output of for i in range(2): print(i)?' },
+    { ar: 'ما هو الفرق بين // و / في بايثون؟', en: 'What is the difference between // and / in Python?' },
+    { ar: 'كيف تكتب جملة شرطية للتحقق إذا كان العدد أكبر من 10؟', en: 'How to check if a number is greater than 10?' },
+  ];
+  for (let i = 0; i < 90; i++) {
+    const t = topics[i % topics.length];
+    const opts = ['الخيار الأول', 'الخيار الثاني', 'الخيار الثالث', 'الخيار الرابع'];
+    const correct = i % 4;
+    bankQuestions.push({
+      ar: t.ar + ` (السؤال ${i+1})`,
+      en: t.en + ` (Question ${i+1})`,
+      options: opts,
+      correct: correct
+    });
+  }
+</script>
+</body>
+</html>
+<script>
+  // ============================================================
+  // الجزء الرابع: دوال العرض والتحكم
+  // ============================================================
+
+  // ===== دالة عرض أسئلة الملف =====
+  function renderFileQuestions() {
+    const grid = document.getElementById('questionsGrid');
+    grid.innerHTML = '';
+    fileQuestions.forEach((q, index) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-header">
+          <span class="lab-tag">📘 لاب ${q.lab}</span>
+          <span class="q-type">${q.type}</span>
+        </div>
+        <div class="question-text question-text-ar">${q.ar}</div>
+        <div class="question-text question-text-en">${q.en}</div>
+        <button class="btn-solution" onclick="toggleSolution(${index})">💡 إظهار الحل</button>
+        <div class="solution-wrapper" id="solution-${index}">
+          <div class="code-block">${q.code}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  // ===== دالة إظهار/إخفاء الحل =====
+  function toggleSolution(index) {
+    const wrapper = document.getElementById(`solution-${index}`);
+    const btn = wrapper.previousElementSibling;
+    if (wrapper.classList.contains('show')) {
+      wrapper.classList.remove('show');
+      btn.textContent = '💡 إظهار الحل';
+    } else {
+      wrapper.classList.add('show');
+      btn.textContent = '🙈 إخفاء الحل';
+    }
+  }
+
+  // ===== متغيرات الامتحان =====
+  let currentExamQuestions = [];
+  let currentExamIndex = 0;
+
+  // ===== توليد امتحان عشوائي =====
+  function generateExam() {
+    const shuffled = [...bankQuestions].sort(() => Math.random() - 0.5);
+    currentExamQuestions = shuffled.slice(0, 20);
+    currentExamIndex = 0;
+    renderExamSelector();
+    renderExam();
+    document.getElementById('examResult').style.display = 'none';
+  }
+
+  // ===== عرض أزرار اختيار الامتحان =====
+  function renderExamSelector() {
+    const container = document.getElementById('examSelector');
+    container.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.textContent = '🔄 امتحان جديد (20 سؤال)';
+    btn.className = 'active';
+    btn.onclick = generateExam;
+    container.appendChild(btn);
+  }
+
+  // ===== عرض أسئلة الامتحان =====
+  function renderExam() {
+    const container = document.getElementById('examContainer');
+    container.innerHTML = '';
+    if (currentExamQuestions.length === 0) {
+      container.innerHTML = '<p>⚠️ اضغط على "امتحان جديد" لبدء الامتحان.</p>';
+      return;
+    }
+    currentExamQuestions.forEach((q, index) => {
+      const div = document.createElement('div');
+      div.className = 'exam-question';
+      div.innerHTML = `
+        <p><strong>${index+1}.</strong> <span class="question-text-ar">${q.ar}</span><span class="question-text-en">${q.en}</span></p>
+        ${q.options.map((opt, i) => `
+          <label>
+            <input type="radio" name="exam${index}" value="${i}">
+            ${opt}
+          </label>
+        `).join('')}
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  // ===== تصحيح الامتحان =====
+  function submitExam() {
+    let score = 0;
+    const total = currentExamQuestions.length;
+    if (total === 0) {
+      alert('⚠️ الرجاء توليد امتحان أولاً.');
+      return;
+    }
+    for (let i = 0; i < total; i++) {
+      const radios = document.querySelectorAll(`input[name="exam${i}"]`);
+      let selected = null;
+      radios.forEach(r => { if (r.checked) selected = parseInt(r.value); });
+      if (selected === currentExamQuestions[i].correct) score++;
+    }
+    const resultDiv = document.getElementById('examResult');
+    resultDiv.style.display = 'block';
+    const lang = document.body.classList.contains('lang-en') ? 'en' : 'ar';
+    if (lang === 'ar') {
+      resultDiv.innerHTML = `✅ نتيجتك: ${score} من ${total} (${Math.round(score/total*100)}%)`;
+      if (score === total) resultDiv.innerHTML += ' 🎉 ممتاز!';
+      else if (score >= 15) resultDiv.innerHTML += ' 👍 جيد جداً!';
+      else if (score >= 10) resultDiv.innerHTML += ' 📖 تحتاج مراجعة.';
+      else resultDiv.innerHTML += ' ❗ راجع الدروس جيداً.';
+    } else {
+      resultDiv.innerHTML = `✅ Your score: ${score} out of ${total} (${Math.round(score/total*100)}%)`;
+      if (score === total) resultDiv.innerHTML += ' 🎉 Excellent!';
+      else if (score >= 15) resultDiv.innerHTML += ' 👍 Very good!';
+      else if (score >= 10) resultDiv.innerHTML += ' 📖 Need review.';
+      else resultDiv.innerHTML += ' ❗ Please review the lessons.';
+    }
+  }
+
+  // ===== التحكم في اللغة =====
+  document.getElementById('langToggle').addEventListener('click', function() {
+    document.body.classList.toggle('lang-en');
+    document.body.classList.toggle('lang-ar');
+    const isEn = document.body.classList.contains('lang-en');
+    this.textContent = isEn ? '🇬🇧 English / عربي' : '🇸🇦 عربي / English';
+    renderFileQuestions();
+    renderExam();
+    document.getElementById('examResult').style.display = 'none';
+  });
+
+  // ===== التحكم في الوضع المظلم =====
+  document.getElementById('darkToggle').addEventListener('click', function() {
+    document.body.classList.toggle('dark');
+    this.textContent = document.body.classList.contains('dark') ? '☀️ وضع النهار' : '🌙 الوضع المظلم';
+  });
+
+  // ===== ربط زر التصحيح =====
+  document.getElementById('submitExam').addEventListener('click', submitExam);
+
+  // ===== تشغيل العرض =====
+  renderFileQuestions();
+  generateExam();
+</script>
+</body>
+</html>
